@@ -6,9 +6,9 @@ use sdl2::rect::Rect;
 use sdl2::render::WindowCanvas;
 use std::time::Duration;
 
-const WIDTH: usize = 800;
-const HEIGHT: usize = 600;
-const CELLSIZE: usize = 10;
+const WIDTH: usize = 1200;
+const HEIGHT: usize = 800;
+const CELLSIZE: usize = 5;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -32,7 +32,8 @@ fn main() -> Result<(), String> {
     let mut field = vec![vec![false; WIDTH]; HEIGHT];
 
     let preset_number = 0;
-    preset(preset_number, 0, 0, &mut field);
+    let (preset_x, preset_y) = (WIDTH / CELLSIZE / 2, HEIGHT / CELLSIZE / 2);
+    preset(preset_number, preset_x, preset_y, &mut field);
 
     let mut running = false;
     let mut delay = 50;
@@ -84,7 +85,7 @@ fn main() -> Result<(), String> {
                     keycode: Some(Keycode::Comma),
                     ..
                 } => {
-                    delay = u32::max(1, delay - 10);
+                    delay = i32::max(1, delay as i32 - 10) as u32;
                 }
                 Event::KeyDown {
                     keycode: Some(Keycode::Period),
@@ -97,7 +98,7 @@ fn main() -> Result<(), String> {
                     ..
                 } => {
                     field = vec![vec![false; WIDTH]; HEIGHT];
-                    preset(preset_number, 0, 0, &mut field);
+                    preset(preset_number, preset_x, preset_y, &mut field);
                 }
                 _ => {}
             }
@@ -130,12 +131,16 @@ fn visualize_field(canvas: &mut WindowCanvas, field: &mut Vec<Vec<bool>>) {
             } else {
                 canvas.set_draw_color(Color::RGB(0, 0, 0));
             }
-            canvas.fill_rect(Rect::new(
+
+            match canvas.fill_rect(Rect::new(
                 (x * CELLSIZE) as i32,
                 (y * CELLSIZE) as i32,
                 (CELLSIZE - 1) as u32,
                 (CELLSIZE - 1) as u32,
-            ));
+            )) {
+                Err(e) => println!("{:?}", e),
+                _ => (),
+            }
         }
     }
     canvas.present();
@@ -258,6 +263,21 @@ fn preset(n: u32, x: usize, y: usize, field: &mut Vec<Vec<bool>>) {
             set(x + 25, y + 6, true, field);
             set(x + 25, y + 1, true, field);
             set(x + 25, y + 7, true, field);
+        }
+        1 => {
+            set(x + 1, y + 1, true, field);
+            set(x + 2, y + 1, true, field);
+            set(x + 3, y + 1, true, field);
+            set(x + 5, y + 1, true, field);
+            set(x + 1, y + 2, true, field);
+            set(x + 4, y + 3, true, field);
+            set(x + 5, y + 3, true, field);
+            set(x + 2, y + 4, true, field);
+            set(x + 3, y + 4, true, field);
+            set(x + 5, y + 4, true, field);
+            set(x + 1, y + 5, true, field);
+            set(x + 3, y + 5, true, field);
+            set(x + 5, y + 5, true, field);
         }
         _ => {}
     }
